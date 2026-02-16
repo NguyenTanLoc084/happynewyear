@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gửi Tường Vy ♥</title>
     <style>
         :root {
@@ -22,6 +22,7 @@
             background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
             overflow: hidden;
             font-family: 'Segoe UI', Tahoma, sans-serif;
+            touch-action: manipulation; /* Tối ưu cho cảm ứng */
         }
 
         /* Trái tim rơi nền */
@@ -38,13 +39,15 @@
             to { transform: translateY(110vh) rotate(360deg); }
         }
 
-        /* Container chính */
+        /* Container chính - Responsive cực mạnh */
         .envelope-wrapper {
             position: relative;
-            width: 300px;
-            height: 200px;
+            width: 90vw; /* Chiếm 90% chiều rộng màn hình mobile */
+            max-width: 320px; /* Nhưng không quá 320px trên máy tính */
+            height: 220px;
             cursor: pointer;
             z-index: 10;
+            transition: transform 0.3s;
         }
 
         .envelope {
@@ -53,10 +56,11 @@
             height: 100%;
             background: var(--envelope-color);
             border-radius: 0 0 10px 10px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             z-index: 5;
         }
 
+        /* Lớp nền trong để che thư khi đóng */
         .envelope::after {
             content: "";
             position: absolute;
@@ -70,17 +74,26 @@
             border-radius: 0 0 10px 10px;
         }
 
+        /* Nắp phong bì */
         .envelope::before {
             content: "";
             position: absolute;
             top: 0;
             left: 0;
             z-index: 10;
-            border-left: 150px solid transparent;
-            border-right: 150px solid transparent;
-            border-top: 105px solid var(--envelope-lid);
+            border-left: 45vw solid transparent;
+            border-right: 45vw solid transparent;
+            border-top: 110px solid var(--envelope-lid);
             transform-origin: top;
             transition: transform 0.6s ease, z-index 0.6s;
+        }
+
+        /* Điều chỉnh nắp cho máy tính */
+        @media (min-width: 600px) {
+            .envelope::before {
+                border-left: 160px solid transparent;
+                border-right: 160px solid transparent;
+            }
         }
 
         .envelope.open::before {
@@ -94,10 +107,10 @@
             bottom: 10px;
             left: 50%;
             transform: translateX(-50%);
-            width: 260px;
-            height: 160px;
+            width: 85%;
+            height: 80%;
             background: white;
-            padding: 20px;
+            padding: 15px;
             box-sizing: border-box;
             transition: all 0.7s ease-in-out;
             z-index: 4;
@@ -109,18 +122,19 @@
         }
 
         .envelope.open .letter {
-            bottom: 110px;
-            width: 350px;
+            bottom: 80px;
+            width: 100%;
             height: auto;
-            min-height: 200px;
-            transform: translateX(-50%) scale(1.1);
+            min-height: 250px;
+            transform: translateX(-50%) scale(1.05);
             visibility: visible;
             opacity: 1;
             z-index: 8;
         }
 
-        h1 { color: var(--primary-pink); font-size: 1.2rem; margin: 0; margin-bottom: 10px; }
-        #wish-content { font-size: 1rem; color: #444; line-height: 1.5; font-style: italic; }
+        h1 { color: var(--primary-pink); font-size: 1.1rem; margin: 0 0 10px 0; }
+        #wish-content { font-size: 0.95rem; color: #444; line-height: 1.4; font-style: italic; }
+        .footer-text { font-size: 0.9rem; margin-top: 10px; font-weight: bold; }
         .heart-icon { color: red; animation: pulse 1s infinite; display: inline-block; }
 
         @keyframes pulse {
@@ -130,11 +144,12 @@
 
         .hint {
             position: absolute;
-            top: -50px;
+            top: -60px;
             width: 100%;
             text-align: center;
             font-weight: bold;
             color: #fff;
+            font-size: 0.9rem;
             text-shadow: 1px 1px 5px rgba(0,0,0,0.3);
             animation: bounce 1.5s infinite;
         }
@@ -147,13 +162,13 @@
 <body>
 
     <div class="envelope-wrapper" onclick="toggleLetter()">
-        <div class="hint" id="hint-text">Mở quà bí mật từ anh nè Vy! ♥</div>
+        <div class="hint" id="hint-text">Mở quà bí mật cho Vy nè! ♥</div>
         <div class="envelope" id="envelope">
             <div class="letter">
                 <h1>Happy New Year 2026!</h1>
-                <p id="wish-content">Đang tải lời chúc...</p>
-                <p><strong>Yêu Tường Vy rất nhiều!</strong> <span class="heart-icon">❤</span></p>
-                <p style="font-size: 1.5rem;">🧧✨🎆</p>
+                <p id="wish-content">Đang chuẩn bị lời chúc...</p>
+                <p class="footer-text">Yêu Tường Vy rất nhiều! <span class="heart-icon">❤</span></p>
+                <p style="font-size: 1.5rem; margin: 5px 0;">🧧✨🎆</p>
             </div>
         </div>
     </div>
@@ -161,50 +176,46 @@
     <canvas id="fireworks"></canvas>
 
     <script>
-        // Danh sách lời chúc ngẫu nhiên
         const wishes = [
-            "Chúc Tường Vy năm mới luôn xinh đẹp rạng ngời, cười thật nhiều và lúc nào cũng hạnh phúc bên anh nhé!",
-            "Năm mới chúc cô gái của anh vạn sự như ý, học tập thật tốt và sớm trở thành cô giáo tuyệt vời nhất nha.",
-            "Mong rằng 2026 sẽ là một năm đầy ắp kỉ niệm ngọt ngào của hai đứa mình. Yêu em vô cùng!",
-            "Chúc Vy năm mới thật nhiều sức khỏe, luôn bình an và gặp thật nhiều may mắn trong cuộc sống.",
-            "Cảm ơn Vy đã luôn là động lực của anh. Năm mới hãy cùng anh viết tiếp câu chuyện tình yêu này nhé!",
-            "Chúc bé Vy của anh luôn đáng yêu như thế này, mọi muộn phiền của năm cũ sẽ tan biến hết nha!",
-            "Một năm mới rực rỡ đang chờ đón Vy. Anh sẽ luôn ở đây, làm điểm tựa vững chắc nhất cho em."
+            "Chúc Tường Vy năm mới luôn xinh đẹp rạng ngời, cười thật nhiều và hạnh phúc bên anh nhé!",
+            "Năm mới chúc cô gái của anh vạn sự như ý, sớm trở thành cô giáo tuyệt vời nhất nha.",
+            "Mong rằng 2026 sẽ là một năm đầy ắp kỉ niệm ngọt ngào của hai đứa mình. Yêu em!",
+            "Chúc Vy năm mới thật nhiều sức khỏe, bình an và gặp thật nhiều may mắn.",
+            "Cảm ơn Vy đã luôn là động lực của anh. Năm mới hãy cùng anh viết tiếp chuyện tình mình nhé!",
+            "Chúc bé Vy của anh luôn đáng yêu, mọi muộn phiền năm cũ sẽ tan biến hết nha!",
+            "Một năm mới rực rỡ đang chờ đón Vy. Anh sẽ luôn ở đây làm điểm tựa cho em."
         ];
 
-        // Tạo trái tim rơi
+        // Trái tim rơi
         setInterval(() => {
             const heart = document.createElement('div');
             heart.classList.add('heart-bg');
             heart.innerHTML = '❤';
             heart.style.left = Math.random() * 100 + 'vw';
-            heart.style.animationDuration = Math.random() * 3 + 3 + 's';
-            heart.style.fontSize = Math.random() * 15 + 15 + 'px';
+            heart.style.animationDuration = Math.random() * 3 + 2 + 's';
+            heart.style.fontSize = Math.random() * 15 + 10 + 'px';
             document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 6000);
-        }, 400);
+            setTimeout(() => heart.remove(), 5000);
+        }, 500);
 
-        // Đóng/Mở thư và đổi lời chúc
         function toggleLetter() {
             const env = document.getElementById('envelope');
             const hint = document.getElementById('hint-text');
             const wishDisplay = document.getElementById('wish-content');
             
             if (!env.classList.contains('open')) {
-                const randomWish = wishes[Math.floor(Math.random() * wishes.length)];
-                wishDisplay.innerText = randomWish;
-                
+                wishDisplay.innerText = wishes[Math.floor(Math.random() * wishes.length)];
                 env.classList.add('open');
-                hint.innerText = "Bấm để cất thư đi nhé!";
+                hint.innerText = "Bấm để đóng lại nha!";
                 startFireworks();
             } else {
                 env.classList.remove('open');
-                hint.innerText = "Bấm mở tiếp để nhận điều bất ngờ! ♥";
+                hint.innerText = "Bấm để nhận bất ngờ khác! ♥";
                 stopFireworks();
             }
         }
 
-        // Script pháo hoa
+        // Script pháo hoa (giữ nguyên logic rực rỡ)
         const canvas = document.getElementById('fireworks');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -229,7 +240,7 @@
             const x = Math.random() * canvas.width;
             const y = Math.random() * canvas.height * 0.4;
             const color = `hsl(${Math.random() * 360}, 100%, 60%)`;
-            for (let i = 0; i < 50; i++) {
+            for (let i = 0; i < 40; i++) {
                 particles.push({
                     x, y,
                     vx: (Math.random() - 0.5) * 8,
@@ -248,15 +259,20 @@
             requestAnimationFrame(render);
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             particles.forEach((p, i) => {
-                p.x += p.vx; p.y += p.vy; p.alpha -= 0.015;
+                p.x += p.vx; p.y += p.vy; p.alpha -= 0.02;
                 ctx.globalAlpha = p.alpha;
                 ctx.fillStyle = p.color;
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
+                ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
                 ctx.fill();
                 if (p.alpha <= 0) particles.splice(i, 1);
             });
         }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
     </script>
 </body>
 </html>
